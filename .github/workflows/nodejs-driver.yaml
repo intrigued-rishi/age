@@ -1,9 +1,9 @@
-name: Python Driver Tests
+name: Nodejs Driver Tests
 
 on:
   push:
     branches: [ "master", "PG11" ]
-      
+
   pull_request:
     branches: [ "master", "PG11" ]
 
@@ -13,7 +13,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: drivers/python
+        working-directory: drivers/nodejs/
   
     steps:
     - uses: actions/checkout@v3
@@ -39,21 +39,16 @@ jobs:
         export TAG=$TAG
         docker-compose up -d
 
-    - name: Set up python
-      uses: actions/setup-python@v4
+    - name: Set up Node
+      uses: actions/setup-node@v3
       with:
-        python-version: '3.10'
+        node-version: latest
 
-    - name: Install pre-requisites
-      run: |
-        sudo apt-get install python3-dev libpq-dev
-        pip install -r requirements.txt
+    - name: Install dependencies
+      run: npm install
 
     - name: Build
-      run: |
-        python setup.py install
+      run: npm run build
 
     - name: Test
-      run: |
-        python test_age_py.py -db "postgres" -u "postgres" -pass "agens"
-        python -m unittest -v test_agtypes.py
+      run: npm test
